@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & About - CineArtistry</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .legal-glass-box {
+            max-width: 800px;
+            text-align: left;
+            margin: 100px auto;
+        }
+        .legal-content h3 {
+            color: var(--accent-gold);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .legal-content p, .legal-content li {
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar stylish-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon-container">
+                    <i class="fas fa-film"></i>
+                </div>
+                <span>CineArtistry</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/login" class="nav-link">Login</a>
+                <a href="/signup" class="nav-btn-glow">Join Now</a>
+            </div>
+        </div>
+    </nav>
+    <div class="auth-full-screen" style="align-items: flex-start; padding-top: 50px;">
+        <div class="auth-glass-box legal-glass-box">
+            <h2 style="text-align: center;">About CineArtistry</h2>
+            <div class="legal-content" style="text-align: center;">
+                <p style="font-size: 1.1rem; margin-bottom: 30px;">The world's most elegant movie recommendation engine.</p>
+                
+                <h3 style="text-align: left;">Our Mission</h3>
+                <p style="text-align: left;">CineArtistry was born out of a passion for pure cinema. Our goal is to break the endless scrolling fatigue of modern streaming apps by providing a highly stylized, curated, and premium interface to discover gems across 5 native languages.</p>
+
+                <h3 style="text-align: left;">The Tech Stack</h3>
+                <p style="text-align: left;">Powered by Python Flask, SQLite, Vanilla CSS Glassmorphism, and dynamic background syncs with public film databases (like OMDB) and YouTube to pull high-definition original artwork and trailers natively into our experience.</p>
+                
+                <h3 style="text-align: left;">Get in Touch</h3>
+                <p style="text-align: left;">Have a feature request, found a bug, or want to collaborate with us? Drop us an email:</p>
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: inline-block; margin-top: 10px;">
+                    <i class="fas fa-envelope" style="color: var(--accent-gold); margin-right: 10px;"></i>
+                    <strong style="color: white; letter-spacing: 1px;">hello@cineartistry.com</strong>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <a href="/" class="auth-btn-premium" style="text-decoration: none; display: inline-block; width: auto; padding: 10px 30px;">Return Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

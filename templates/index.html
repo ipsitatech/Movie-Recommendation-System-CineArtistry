@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineArtistry - Discover Your Next Favorite Movie</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar stylish-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon-container">
+                    <i class="fas fa-film"></i>
+                </div>
+                <span>CineArtistry</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="#" class="nav-link" onclick="scrollToMyMovies(); return false;"><i class="fas fa-heart"></i> My Movies</a>
+            </div>
+            <div class="nav-buttons">
+
+                {% if session.user_id %}
+                <div class="user-profile-nav">
+                    <span class="welcome-text">Hi, <strong>{{ session.username }}</strong></span>
+                    <a href="/logout" class="nav-link-logout">Logout</a>
+                </div>
+                {% else %}
+                <a href="/login" class="nav-link">Login</a>
+                <a href="/signup" class="nav-btn-glow">Join Now</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for category, message in messages %}
+        <div class="flash-message glass-toast {{ category }}">
+            <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Billboard Hero Section (Dynamic) -->
+    <section class="billboard-container aggregator-hero" id="heroSection">
+        <div class="billboard-item" style="position: relative;">
+            <!-- 3D Stylish Particle Background Container -->
+            <div id="hero-three-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; background: #060d17;"></div>
+            
+            <img id="heroBg"
+                src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=90"
+                class="billboard-bg" alt="Featured Movie" style="opacity: 0.15; mix-blend-mode: overlay; pointer-events: none; position: absolute; z-index: 1;">
+                
+            <div class="billboard-content" id="heroContent" style="position: relative; z-index: 10;">
+                <div class="featured-badge"><i class="fas fa-fire"></i> TRENDING NOW</div>
+                <h1 class="billboard-title" id="heroTitle">Loading...</h1>
+                <div class="billboard-meta" id="heroMeta"></div>
+                <p class="billboard-description" id="heroDescription">Discover the best of cinema, curated just for you.</p>
+                <div class="billboard-actions">
+                    <button class="bill-btn play-btn-main" id="heroPlayBtn" onclick="handleHeroPlay()">
+                        <i class="fas fa-play"></i> Watch Trailer
+                    </button>
+                    <button class="bill-btn info-btn-glass" id="heroInfoBtn" onclick="handleHeroInfo()">
+                        <i class="fas fa-info-circle"></i> View Details
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="billboard-vignette"></div>
+    </section>
+
+    <!-- Streaming Providers Filter Bar -->
+    <div class="provider-bar-section glass-effect">
+        <div class="provider-bar-container">
+            <span class="provider-header"><i class="fas fa-play-circle"></i> STREAM ON:</span>
+            <div class="provider-list" id="providerList">
+                <div class="provider-item active" data-provider="all">
+                    <div class="provider-bubble all-bubble"><i class="fas fa-film"></i></div>
+                    <span class="provider-name">All</span>
+                </div>
+                <div class="provider-item" data-provider="netflix">
+                    <div class="provider-bubble" style="background: linear-gradient(135deg,#e50914,#b20710)">N</div>
+                    <span class="provider-name">Netflix</span>
+                </div>
+                <div class="provider-item" data-provider="prime">
+                    <div class="provider-bubble" style="background: linear-gradient(135deg,#00a8e1,#007eb3)">P</div>
+                    <span class="provider-name">Prime</span>
+                </div>
+                <div class="provider-item" data-provider="disney">
+                    <div class="provider-bubble" style="background: linear-gradient(135deg,#113ccf,#0d2ea0)">D+</div>
+                    <span class="provider-name">Disney+</span>
+                </div>
+                <div class="provider-item" data-provider="apple">
+                    <div class="provider-bubble" style="background: linear-gradient(135deg,#2c2c2e,#1c1c1e)"><i class="fab fa-apple"></i></div>
+                    <span class="provider-name">Apple TV</span>
+                </div>
+                <div class="provider-item" data-provider="hbo">
+                    <div class="provider-bubble" style="background: linear-gradient(135deg,#5e42a6,#3d2b70)">H</div>
+                    <span class="provider-name">HBO Max</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- 🔥 Trending Now Section -->
+        <section class="trending-section" id="trendingSection">
+            <div class="trending-header">
+                <h2 class="trending-title"><i class="fas fa-fire"></i> Trending Now</h2>
+                <span class="trending-badge">HOT</span>
+            </div>
+            <div class="trending-slider-wrapper">
+                <button class="nr-arrow nr-arrow-left" onclick="slideTrending(-1)"><i class="fas fa-chevron-left"></i></button>
+                <div class="trending-slider" id="trendingSlider">
+                    <div class="nr-loading"><div class="cinematic-loader"></div><p>Loading trending…</p></div>
+                </div>
+                <button class="nr-arrow nr-arrow-right" onclick="slideTrending(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Aggregator Controls -->
+        <div class="aggregator-controls">
+            <div class="search-glass" style="position: relative;">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search 1,111+ movies, genres, or providers..." autocomplete="off">
+                <!-- Recent Searches Dropdown -->
+                <div id="recentSearchesDropdown" class="recent-searches-dropdown hidden">
+                    <div class="rs-header">
+                        <span>Recent Searches</span>
+                        <button id="clearSearchesBtn" class="rs-clear-btn">Clear All</button>
+                    </div>
+                    <ul id="rsList" class="rs-list"></ul>
+                </div>
+            </div>
+            <button id="toggle3D" class="discovery-pill">
+                <i class="fas fa-cube"></i> Discover in 3D
+            </button>
+        </div>
+
+        <!-- 3D Container (Hidden by default) -->
+        <div id="three-canvas-container" class="hidden"></div>
+
+        <!-- Genre Browser -->
+        <section class="genre-section">
+            <h2 class="genre-section-title"><i class="fas fa-layer-group"></i> Browse by Genre</h2>
+            <div class="genre-grid" id="genreGrid">
+                <div class="genre-card" data-genre="Action" style="--g1:#1a0533;--g2:#3d0b6b;--g3:#6a1fc2;">
+                    <div class="genre-scene">
+                        <div class="scene-car"></div>
+                        <div class="scene-road"></div>
+                        <div class="scene-sparks"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 60% 80%, rgba(106,31,194,0.7), transparent 70%)"></div>
+                    <span class="genre-label">ACTION</span>
+                </div>
+                <div class="genre-card" data-genre="Adventure" style="--g1:#0a2a1a;--g2:#0d4a2d;--g3:#1a7a47;">
+                    <div class="genre-scene">
+                        <div class="scene-palm"></div>
+                        <div class="scene-palm scene-palm2"></div>
+                        <div class="scene-moon"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 40% 90%, rgba(26,122,71,0.6), transparent 70%)"></div>
+                    <span class="genre-label">ADVENTURE</span>
+                </div>
+                <div class="genre-card" data-genre="Comedy" style="--g1:#1a0f33;--g2:#311a6b;--g3:#5a2eaa;">
+                    <div class="genre-scene">
+                        <div class="scene-mic"></div>
+                        <div class="scene-spotlight"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 80%, rgba(90,46,170,0.7), transparent 70%)"></div>
+                    <span class="genre-label">COMEDY</span>
+                </div>
+                <div class="genre-card" data-genre="Drama" style="--g1:#060e22;--g2:#0d1e44;--g3:#1a3580;">
+                    <div class="genre-scene">
+                        <div class="scene-lamp"></div>
+                        <div class="scene-fog"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 90%, rgba(26,53,128,0.7), transparent 70%)"></div>
+                    <span class="genre-label">DRAMA</span>
+                </div>
+                <div class="genre-card" data-genre="Romance" style="--g1:#2a0a2a;--g2:#5a1060;--g3:#9b2fa0;">
+                    <div class="genre-scene">
+                        <div class="scene-heart"></div>
+                        <div class="scene-stars"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 80%, rgba(155,47,160,0.7), transparent 70%)"></div>
+                    <span class="genre-label">ROMANCE</span>
+                </div>
+                <div class="genre-card" data-genre="Sci-Fi" style="--g1:#050f22;--g2:#0a2040;--g3:#0d4080;">
+                    <div class="genre-scene">
+                        <div class="scene-city"></div>
+                        <div class="scene-beam"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 90%, rgba(0,200,255,0.3), transparent 70%)"></div>
+                    <span class="genre-label">SCI-FI</span>
+                </div>
+                <div class="genre-card" data-genre="Thriller" style="--g1:#0f0a04;--g2:#2a1a08;--g3:#4a2e10;">
+                    <div class="genre-scene">
+                        <div class="scene-eye"></div>
+                        <div class="scene-shadow"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 80%, rgba(255,120,0,0.25), transparent 70%)"></div>
+                    <span class="genre-label">THRILLER</span>
+                </div>
+                <div class="genre-card" data-genre="Crime" style="--g1:#0a0a14;--g2:#14142a;--g3:#22223d;">
+                    <div class="genre-scene">
+                        <div class="scene-building"></div>
+                        <div class="scene-rain"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 80%, rgba(80,80,200,0.3), transparent 70%)"></div>
+                    <span class="genre-label">CRIME</span>
+                </div>
+                <div class="genre-card" data-genre="Horror" style="--g1:#0a0404;--g2:#1a0808;--g3:#2e0e0e;">
+                    <div class="genre-scene">
+                        <div class="scene-tree"></div>
+                        <div class="scene-fog"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 90%, rgba(180,0,0,0.3), transparent 70%)"></div>
+                    <span class="genre-label">HORROR</span>
+                </div>
+                <div class="genre-card" data-genre="Historical" style="--g1:#1a1000;--g2:#3d2800;--g3:#6b4800;">
+                    <div class="genre-scene">
+                        <div class="scene-pillar"></div>
+                        <div class="scene-pillar scene-pillar2"></div>
+                    </div>
+                    <div class="genre-glow" style="background: radial-gradient(ellipse at 50% 90%, rgba(200,140,0,0.3), transparent 70%)"></div>
+                    <span class="genre-label">HISTORICAL</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── New Releases Section ── -->
+        <section class="new-releases-section" id="newReleasesSection">
+            <div class="nr-header">
+                <div class="nr-title-group">
+                    <span class="nr-live-dot"></span>
+                    <h2 class="nr-title"><i class="fas fa-bolt"></i> New Releases</h2>
+                    <span class="nr-subtitle">Latest Hindi &amp; English movies</span>
+                </div>
+                <div class="nr-controls">
+                    <span class="nr-updated" id="nrLastUpdated">Updating…</span>
+                    <button class="nr-refresh-btn" id="nrRefreshBtn" onclick="refreshNewReleases()">
+                        <i class="fas fa-sync-alt" id="nrRefreshIcon"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Language tabs -->
+            <div class="nr-tabs">
+                <button class="nr-tab active" data-lang="all"      onclick="switchNRTab(this,'all')">🌐 All</button>
+                <button class="nr-tab"        data-lang="Hindi"    onclick="switchNRTab(this,'Hindi')">🇮🇳 Hindi</button>
+                <button class="nr-tab"        data-lang="English"  onclick="switchNRTab(this,'English')">🇺🇸 English</button>
+                <button class="nr-tab nr-tab-upcoming" data-lang="upcoming" onclick="switchNRTab(this,'upcoming')">🚀 Upcoming</button>
+            </div>
+
+            <!-- Slider -->
+            <div class="nr-slider-wrapper">
+                <button class="nr-arrow nr-arrow-left"  onclick="slideNR(-1)"><i class="fas fa-chevron-left"></i></button>
+                <div class="nr-slider" id="nrSlider">
+                    <div class="nr-loading"><div class="cinematic-loader"></div><p>Loading new releases…</p></div>
+                </div>
+                <button class="nr-arrow nr-arrow-right" onclick="slideNR(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Movie Rows will be injected here -->
+        <div id="movie-rows-container">
+            <div class="loading-container">
+                <div class="cinematic-loader"></div>
+                <p>Curating your experience...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Movie Modal -->
+    <div id="movieModal" class="modal glass-modal">
+        <div class="modal-content stylish-modal">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <i class="fas fa-film"></i> CineArtistry
+                </div>
+                <p>The world's most elegant movie recommendation engine. Explore cinematic gems across 5 languages
+                    with our proprietary AI discovery system.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Platform</h3>
+                <ul class="footer-links">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#featured">Featured</a></li>
+                    <li><a href="#trending">Trending</a></li>
+                    <li><a href="#new">Native Releases</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('privacy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ url_for('terms') }}">Terms of Use</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact &amp; About</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Stay Inspired</h3>
+                <p>Join our cinematic circle for weekly curated picks.</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="email@example.com">
+                    <button id="newsletterSubmit">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 CineArtistry. Made with <i class="fas fa-heart"></i> for true cinephiles.</p>
+            <div class="footer-tech-stack">
+                <span>Powered by AI Metadata Sync</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bottom Tab Navigation (Mobile Friendly) -->
+    <nav class="bottom-nav">
+        <a href="/" class="bottom-nav-link active">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="bottom-nav-link" onclick="scrollToTrending(); return false;">
+            <i class="fas fa-fire"></i>
+            <span>Trending</span>
+        </a>
+        <a href="#" class="bottom-nav-link" onclick="focusSearch(); return false;">
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+        </a>
+        <a href="#" class="bottom-nav-link" onclick="scrollToMyMovies(); return false;">
+            <i class="fas fa-heart"></i>
+            <span>My Movies</span>
+        </a>
+    </nav>
+
+    <!-- Global Search Loading Feedback -->
+    <div id="searchFeedback" class="search-feedback hidden">
+        <div class="cinematic-loader-small"></div>
+        <span>Searching...</span>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/three_interface.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/hero_three_bg.js') }}" defer></script>
+</body>
+
+</html>

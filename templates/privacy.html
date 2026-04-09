@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - CineArtistry</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .legal-glass-box {
+            max-width: 800px;
+            text-align: left;
+            margin: 100px auto;
+        }
+
+        .legal-content h3 {
+            color: var(--accent-gold);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .legal-content p,
+        .legal-content li {
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .legal-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar stylish-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo-icon-container">
+                    <i class="fas fa-film"></i>
+                </div>
+                <span>CineArtistry</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/login" class="nav-link">Login</a>
+                <a href="/signup" class="nav-btn-glow">Join Now</a>
+            </div>
+        </div>
+    </nav>
+    <div class="auth-full-screen" style="align-items: flex-start; padding-top: 50px;">
+        <div class="auth-glass-box legal-glass-box">
+            <h2 style="text-align: center;">Privacy Policy</h2>
+            <div class="legal-content">
+                <p>Last updated: March 2026</p>
+                <h3>1. Information We Collect</h3>
+                <p>CineArtistry respects your privacy. We collect minimal information essential to providing our premium
+                    cinematic recommendation experience, including account details (username, email) and your
+                    interactions with movie trailers and ratings.</p>
+
+                <h3>2. How We Use Your Information</h3>
+                <ul>
+                    <li>To personalize your movie feed and recommendations.</li>
+                    <li>To improve our proprietary AI discovery system.</li>
+                    <li>To directly communicate important updates safely and securely.</li>
+                </ul>
+
+                <h3>3. Data Security</h3>
+                <p>We employ gold-standard encryption (AES-256) to secure your account credentials. We do not sell your
+                    personal data to third parties.</p>
+
+                <h3>4. Third-Party Integrations</h3>
+                <p>Our platform interfaces with platforms like YouTube to provide high-quality video embeds. Please
+                    review their privacy guidelines regarding embedded media tracking.</p>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="/" class="auth-btn-premium"
+                        style="text-decoration: none; display: inline-block; width: auto; padding: 10px 30px;">Return
+                        Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
